@@ -135,7 +135,7 @@ def update():
               dinoVit=0
 
 def draw():
-   global imagePaire, vitesse, playing
+   global imagePaire, vitesse, playing, cactus_liste
    # si le vaisseau possede des vies le jeu continue
    pyxel.cls(0)    
      
@@ -196,6 +196,10 @@ def draw():
         if playing==3:    
           pyxel.text(100,50, 'GAME OVER', 7)
           pyxel.blt(dinoX, dinoY, 0, 152, 120+dinoTaille*2, 20, dinoTaille,0)      
+          if pyxel.btn(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+               playing=1
+               cactus_liste = []
+               vitesse=-5
           
 ###########Variables Globales#############
 
