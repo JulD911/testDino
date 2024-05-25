@@ -17,6 +17,7 @@ solY = dinoY
 cactus_liste = []
 # vies
 playing = 1
+frames = 0
 # Animation
 imagePaire = 0
 #
@@ -135,12 +136,12 @@ def update():
               dinoVit=0
 
 def draw():
-   global imagePaire, vitesse, playing, cactus_liste
-   # si le vaisseau possede des vies le jeu continue
+   global imagePaire, vitesse, playing, cactus_liste, frames
+   frames = frames +1
    pyxel.cls(0)    
      
    if playing == 0:    
-     pyxel.text(10,10, str(pyxel.frame_count), 7)
+     pyxel.text(80,15, str(frames), 7)
      # Affichage du 'dino'
      #pyxel.rect(dinoX,dinoY,h=dinoTaille,w=dinoTaille,col=9)
      
@@ -158,13 +159,13 @@ def draw():
      etoile2=pyxel.blt(190, 5, 0, 152, 56, 20, 30)
      etoile3=pyxel.blt(220, 5, 0, 152, 56, 20, 30)
      
-     if pyxel.frame_count>=500:
+     if frames>=500:
          etoile1=pyxel.blt(160, 5, 0, 150, 90, 25, 30)
          vitesse=-6
-     if pyxel.frame_count>=1500:
+     if frames>=1500:
          etoile2=pyxel.blt(190, 5, 0, 150, 90, 25, 30)
          vitesse=-7
-     if pyxel.frame_count>=2500:
+     if frames>=2500:
          etoile3=pyxel.blt(220, 5, 0, 150, 90, 25, 30)
          if dinoY==solY:
             playing=2
@@ -200,6 +201,7 @@ def draw():
                playing=1
                cactus_liste = []
                vitesse=-5
+               frames=0
           
 ###########Variables Globales#############
 
