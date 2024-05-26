@@ -1,7 +1,7 @@
 import pyxel
 import random
 
-pyxel.init(250, 100, title="Jeu du dino")
+pyxel.init(250, 100, title="Jeu du dino", fps=30)
 # Taille représentant le dino
 dinoTaille = 24
 # Position en Y du dino (en bas de la fenêtre)
@@ -15,35 +15,28 @@ dinoGravite = 1.7
 solY = dinoY
 # initialisation des ennemis
 cactus_liste = []
-# vies
+# statut du jeu (0:joue, 1:start, 2:perdu, 3:gagné)
 playing = 1
+# nombre de frames depuis le début de la partie
 frames = 0
 # Animation
 imagePaire = 0
 #
-vitesse=-5
+vitesse=-4
 #
 proch_cac=30
+# limite de catus proches
+lim_cactus = 0
 # chargement des images
 import os
 repActuel = os.getcwd()
 pyxel.load(os.path.join(repActuel,"dessin_étoile_julie_emma.pyxres"))
 
 
-def dino_deplacement():
-    #global dinosaure_y
-#    if pyxel.btn(pyxel.KEY_SPACE):
-#         for k in range (15):
-#           dinosaure_y+=1
-#         for k in range (15):
-#           dinosaure_y-=1    
-#         if dinosaure_y 2:
-#             dinosaure_y=dinosaure_y+1
-#         while dinosaure_y!=17:
-#             dinosaure_y=dinosaure_y-1
-        
+def dino_deplacement():        
     # Pour pouvoir modifier ces variables, il faut d'abord les déclarer comme globales
     global dinoY, dinoVit, dinoX
+    
     # Détection de la touche échap pour arrêter le  jeu
     if pyxel.btnp(pyxel.KEY_Q):
         pyxel.quit()  
@@ -51,48 +44,32 @@ def dino_deplacement():
     if dinoY==solY and (pyxel.btn(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)):
         # On donne une vitesse négative (vers le haut) au dino
         dinoVit=-15
-         
-         
-         
-         
+              
 def cactus_creation():
     """création aléatoire des ennemis"""
-    global proch_cac
+    global proch_cac, lim_cactus
     proch_cac-=1
     if proch_cac==0:
         cactus_liste.append([240, 80])
-        if random.random()>0.3:
+        if (random.random()>0.5) or (lim_cactus>=3):
            proch_cac=random.randint(25,35)
+           lim_cactus = 1
         else:
-            proch_cac=random.randint(5,10)
-    # un ennemi par seconde
-    #print (pyxel.frame_count,pyxel.frame_count % int(30//vitesse),pyxel.frame_count % int(30//vitesse) == 0)
-    #if (pyxel.frame_count % int(30//vitesse) == 0):
-        #cactus_liste.append([240, 80])
-    
-    #return cactus_liste
-
+            proch_cac=random.randint(3,8)
+            lim_cactus += 1
 
 def cactus_deplacement():
-    """déplacement des ennemis vers le haut et suppression s'ils sortent du cadre"""
-
     for cactu in cactus_liste:
-        cactu[0] += vitesse
-        if  cactu[0]<0:
+        cactu[0] += vitesse  
+    for cactu in cactus_liste: 
+        if  cactu[0]<-16:
             cactus_liste.remove(cactu)
-    #return cactus_liste
-            
-            
+               
 def dino_suppression():
-    """disparition du vaisseau et d'un ennemi si contact"""
     global playing
     for cactu in cactus_liste:
         if cactu[0] <= dinoX+8 and cactu[1] <= dinoY+8 and cactu[0]+8 >= dinoX and cactu[1]+8 >= dinoY:
-            #cactus_liste.remove(cactu)
             playing=3
-
-    
-    
 
 def update():
     dino_deplacement()
@@ -105,24 +82,13 @@ def update():
           if pyxel.btnp(pyxel.KEY_Q):
               pyxel.quit()
               
-        # suppression du vaisseau et ennemi si contact
+          # suppression du vaisseau et ennemi si contact
           dino_suppression()
-              
-          
-          #if (vie<=0):
-             # return        
-              
-              
               
           # creation des ennemis
           #cactus_liste = cactus_creation(cactus_liste)
           cactus_creation()
-      
-          # mise a jour des positions des ennemis
-          #cactus_liste = cactus_deplacement(cactus_liste)
           cactus_deplacement()
-              
-      
               
           # Pour chaque frame, on déplace le dino de sa vitesse en Y
           dinoY = dinoY + dinoVit
@@ -161,10 +127,10 @@ def draw():
      
      if frames>=500:
          etoile1=pyxel.blt(160, 5, 0, 150, 90, 25, 30)
-         vitesse=-6
+         vitesse=-5
      if frames>=1500:
          etoile2=pyxel.blt(190, 5, 0, 150, 90, 25, 30)
-         vitesse=-7
+         vitesse=-6
      if frames>=2500:
          etoile3=pyxel.blt(220, 5, 0, 150, 90, 25, 30)
          if dinoY==solY:
@@ -192,26 +158,24 @@ def draw():
            
         if playing==2:
               pyxel.text(100,50, 'VICTORY !', 7)
+              pyxel.blt(60, 30, 0, 152, 24, 32, 20,0) 
               pyxel.blt(dinoX, dinoY, 0, 152, 120+dinoTaille*3, 20, dinoTaille,0) 
+              if pyxel.btn(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+               playing=1
+               cactus_liste = []
+               vitesse=-4
+               frames=0              
              
         if playing==3:    
           pyxel.text(100,50, 'GAME OVER', 7)
+          pyxel.blt(60, 30, 0, 152, 0, 32, 20,0) 
           pyxel.blt(dinoX, dinoY, 0, 152, 120+dinoTaille*2, 20, dinoTaille,0)      
           if pyxel.btn(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                playing=1
                cactus_liste = []
-               vitesse=-5
+               vitesse=-4
                frames=0
           
-###########Variables Globales#############
-
-#dinoX = 16
-#dinosaure_y = 17
-        
-
-
-
-
 pyxel.run(update, draw)
 
  
